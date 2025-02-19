@@ -9,4 +9,4 @@ soma = 0
 for i in range(len(notas)):
     soma = soma + notas[i]
 media = soma / len(notas)
-print(format(media, ".if"))
+print(format(media, ".1f"))
