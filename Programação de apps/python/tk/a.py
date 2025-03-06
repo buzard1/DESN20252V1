@@ -7,45 +7,45 @@ class AcaiApp:
         self.root = root
         self.root.title("Sistema de Açaí 🍧")
         self.root.configure(bg="gray")
-        self.root.geometry("250x500")  # Tamanho da janela
+        self.root.geometry("230x480")  # Tamanho da janela
 
-        main_frame = tk.Frame(root)
+        main_frame = tk.Frame(root, bg="gray")
         main_frame.pack(fill="both", expand=True)
 
-# Criando o Canvas dentro do Frame principal
-        self.canvas = tk.Canvas(main_frame)
+        # Criando o Canvas dentro do Frame principal
+        self.canvas = tk.Canvas(main_frame, bg="gray")
         self.canvas.pack(side="left", fill="both", expand=True)
 
-# Criando a Scrollbar e associando ao Canvas
+        # Criando a Scrollbar e associando ao Canvas
         self.scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
         self.scrollbar.pack(side="right", fill="y")
 
-# Criando um Frame dentro do Canvas (área rolável)
-        self.scrollable_frame = tk.Frame(self.canvas)
+        # Criando um Frame dentro do Canvas (área rolável)
+        self.scrollable_frame = tk.Frame(self.canvas, bg="gray")
 
-# Configuração do Canvas para redimensionar corretamente o conteúdo
+        # Configuração do Canvas para redimensionar corretamente o conteúdo
         self.scrollable_frame.bind(
-    "<Configure>", lambda e: self.canvas.configure(
-        scrollregion=self.canvas.bbox("all")
-    )
-)
+            "<Configure>", lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
 
-# Criando uma janela dentro do Canvas que conterá o frame rolável
+        # Criando uma janela dentro do Canvas que conterá o frame rolável
         self.canvas_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-# Associando a Scrollbar ao Canvas
+        # Associando a Scrollbar ao Canvas
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-# Garantindo que o Frame não se expanda horizontalmente ao adicionar elementos
+        # Garantindo que o Frame não se expanda horizontalmente ao adicionar elementos
         self.scrollable_frame.update_idletasks()
         self.canvas.config(width=self.scrollable_frame.winfo_reqwidth())
 
-# Permitir rolagem com a roda do mouse
+        # Permitir rolagem com a roda do mouse
         def _on_mouse_wheel(event):
             self.canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
-# Associar rolagem do mouse ao Canvas
-            self.canvas.bind_all("<MouseWheel>", _on_mouse_wheel)   
+        # Associar rolagem do mouse ao Canvas
+        self.canvas.bind_all("<MouseWheel>", _on_mouse_wheel)   
 
         # Lista de pedidos
         self.pedidos = []
@@ -99,19 +99,19 @@ class AcaiApp:
 
     def criar_interface(self):
         """Cria a interface do sistema de pedidos."""
-        tk.Label(self.scrollable_frame, text="Escolha o tamanho do copo:", fg='white', bg='black').pack(pady=5, fill="x")
+        tk.Label(self.scrollable_frame, text="Escolha o tamanho do copo:", fg='white', bg='purple').pack(pady=5, fill="x")
         self.criar_radio_buttons_tamanhos()
 
-        tk.Label(self.scrollable_frame, text="Escolha um açaí pré-pronto (Opcional):", fg='white', bg='black').pack(pady=5, fill="x")
+        tk.Label(self.scrollable_frame, text="Escolha um açaí pré-pronto (Opcional):", fg='white', bg='purple').pack(pady=5, fill="x")
         self.criar_radio_buttons_acais()
 
-        tk.Label(self.scrollable_frame, text="Escolha os acompanhamentos:", fg='white', bg='black').pack(pady=5, fill="x")
+        tk.Label(self.scrollable_frame, text="Escolha os acompanhamentos:", fg='white', bg='purple').pack(pady=5, fill="x")
         self.criar_check_buttons_acompanhamentos()
 
         tk.Label(self.scrollable_frame, text="Forma de pagamento:", fg='white', bg='green').pack(pady=2)
         self.criar_radio_buttons_pagamento()
 
-        self.valor_total_label = tk.Label(self.scrollable_frame, text="Total: R$0.00", fg="green", font=("Arial", 12, "bold"))
+        self.valor_total_label = tk.Label(self.scrollable_frame, text="Total: R$0.00", fg="green",bg='grey', font=("Arial", 12, "bold"))
         self.valor_total_label.pack()
 
         tk.Button(self.scrollable_frame, text="Adicionar Açai", command=self.montar_acai).pack()
@@ -121,28 +121,28 @@ class AcaiApp:
         """Cria os radio buttons para selecionar o tamanho do açaí."""
         for tamanho, (preco, ml) in self.precos_tamanhos.items():
             tk.Radiobutton(self.scrollable_frame, text=f"{tamanho} - R${preco:.2f} ({ml})", 
-                           variable=self.tamanho_var, value=tamanho, command=self.atualizar_total).pack()
+                           variable=self.tamanho_var, value=tamanho, command=self.atualizar_total, bg="gray").pack()
 
     def criar_radio_buttons_acais(self):
-        """Cria os radio buttons para selecionar um açaí pré-pronto."""
+        """Cria os radio buttons para selecionar um açaí pré-pronto."""        
         for nome, preco in self.precos_pre_prontos.items():
-            frame = tk.Frame(self.scrollable_frame)
+            frame = tk.Frame(self.scrollable_frame, bg="gray")
             frame.pack()
             tk.Radiobutton(frame, text=f"{nome} - R${preco:.2f}", 
-                           variable=self.pre_pronto_var, value=nome, command=self.atualizar_total).pack(side=tk.LEFT)
-            tk.Button(frame, text="?", command=lambda n=nome: self.mostrar_descricao(n)).pack(side=tk.LEFT)
+                           variable=self.pre_pronto_var, value=nome, command=self.atualizar_total, bg="gray").pack(side=tk.LEFT)
+            tk.Button(frame, text="?", command=lambda n=nome: self.mostrar_descricao(n), bg="gray").pack(side=tk.LEFT)
 
-        tk.Radiobutton(self.scrollable_frame, text="Nenhum", variable=self.pre_pronto_var, value="Nenhum", command=self.atualizar_total).pack()
+        tk.Radiobutton(self.scrollable_frame, text="Nenhum", variable=self.pre_pronto_var, value="Nenhum", command=self.atualizar_total, bg="gray").pack()
 
     def criar_check_buttons_acompanhamentos(self):
         """Cria os check buttons para selecionar os acompanhamentos."""
         for item, var in self.acompanhamentos.items():
-            tk.Checkbutton(self.scrollable_frame, text=f"{item} - R${self.precos_acompanhamentos[item]:.2f}", variable=var, command=self.atualizar_total).pack()
+            tk.Checkbutton(self.scrollable_frame, text=f"{item} - R${self.precos_acompanhamentos[item]:.2f}", variable=var, command=self.atualizar_total, bg="gray").pack()
 
     def criar_radio_buttons_pagamento(self):
         """Cria os radio buttons para selecionar a forma de pagamento."""
         for pagamento in ["Dinheiro", "Cartão", "Pix"]:
-            tk.Radiobutton(self.scrollable_frame, text=pagamento, variable=self.pagamento_var, value=pagamento).pack()
+            tk.Radiobutton(self.scrollable_frame, text=pagamento, variable=self.pagamento_var, value=pagamento, bg="gray").pack()
 
     def atualizar_total(self):
         """Atualiza o valor total do pedido com base nas escolhas feitas."""
@@ -197,12 +197,12 @@ class AcaiApp:
         # Criar uma nova janela para o cupom e a imagem
         nova_janela = tk.Toplevel(self.root)
         nova_janela.title("Cupom Fiscal")
-        nova_janela.geometry("600x400")
+        nova_janela.geometry("600x600")
 
         # Criando o Canvas com a barra de rolagem
-        canvas = tk.Canvas(nova_janela)
+        canvas = tk.Canvas(nova_janela, bg="white")
         scrollbar = ttk.Scrollbar(nova_janela, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas)
+        scrollable_frame = tk.Frame(canvas, bg="white")
 
         scrollable_frame.bind(
             "<Configure>", lambda e: canvas.configure(
@@ -217,7 +217,7 @@ class AcaiApp:
         scrollbar.pack(side="right", fill="y")
 
         # Adicionar o texto do cupom no canvas
-        label_cupom = tk.Label(scrollable_frame, text=cupom, justify=tk.LEFT, font=("Arial", 10))
+        label_cupom = tk.Label(scrollable_frame, text=cupom, justify=tk.LEFT, font=("Arial", 10), bg="white")
         label_cupom.pack(side=tk.LEFT, padx=20)
 
         # Carregar e exibir a imagem
@@ -225,9 +225,9 @@ class AcaiApp:
             imagem = Image.open(r"C:\DESN2025V1\DESN20252V1\Programação de apps\python\tk\image.webp")
             imagem = imagem.resize((400, 300))  # Redimensionar imagem
             img_tk = ImageTk.PhotoImage(imagem)
-            label_imagem = tk.Label(scrollable_frame, image=img_tk)
+            label_imagem = tk.Label(scrollable_frame, image=img_tk, bg="white")
             label_imagem.image = img_tk  # Necessário para manter uma referência à imagem
-            label_imagem.pack(side=tk.RIGHT, padx=20)
+            label_imagem.pack(side=tk.LEFT, padx=20)
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao carregar a imagem: {e}")
 
