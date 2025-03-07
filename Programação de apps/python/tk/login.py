@@ -1,71 +1,126 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from PIL import Image, ImageTk  
+from PIL import Image, ImageTk
+
+class LoginApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Login")
+        self.root.geometry("300x200")
+
+        tk.Label(root, text="Usuário:").pack()
+        self.usuario_entry = tk.Entry(root)
+        self.usuario_entry.pack()
+
+        tk.Label(root, text="Senha:").pack()
+        self.senha_entry = tk.Entry(root, show="*")
+        self.senha_entry.pack()
+
+        tk.Button(root, text="Login", command=self.verificar_login).pack()
+
+    def verificar_login(self):
+        usuario = self.usuario_entry.get()
+        senha = self.senha_entry.get()
+
+        if usuario == "admin" and senha == "123":
+            self.root.destroy()
+            abrir_admin()
+        elif usuario == "cliente" and senha == "123":
+            self.root.destroy()
+            abrir_acai_cliente()
+        else:
+            messagebox.showerror("Erro", "Usuário ou senha incorretos!")
+
+def abrir_login():
+    root = tk.Tk()
+    LoginApp(root)
+    root.mainloop()
+
+class AdminApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Admin - Gerenciar Produtos")
+        self.root.geometry("300x200")
+        
+        tk.Label(root, text="Tela de Admin").pack()
+        tk.Button(root, text="Sair", command=self.voltar_login).pack()
+    
+    def voltar_login(self):
+        self.root.destroy()
+        abrir_login()
+
+def abrir_admin():
+    root = tk.Tk()
+    AdminApp(root)
+    root.mainloop()
+
+class ClienteApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Montar Açaí")
+        self.root.geometry("300x200")
+        
+        tk.Label(root, text="Tela do Cliente").pack()
+        tk.Button(root, text="Sair", command=self.voltar_login).pack()
+    
+    def voltar_login(self):
+        self.root.destroy()
+        abrir_login()
+
+def abrir_acai_cliente():
+    root = tk.Tk()
+    AcaiApp(root)
+    root.mainloop()
 
 class AcaiApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Sistema de Açaí 🍧")
         self.root.configure(bg="gray")
-        self.root.geometry("230x480")  # Tamanho da janela
+        self.root.geometry("230x480")
 
         main_frame = tk.Frame(root, bg="gray")
         main_frame.pack(fill="both", expand=True)
 
-        # Criando o Canvas dentro do Frame principal
         self.canvas = tk.Canvas(main_frame, bg="gray")
         self.canvas.pack(side="left", fill="both", expand=True)
 
-        # Criando a Scrollbar e associando ao Canvas
         self.scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
         self.scrollbar.pack(side="right", fill="y")
 
-        # Criando um Frame dentro do Canvas (área rolável)
         self.scrollable_frame = tk.Frame(self.canvas, bg="gray")
 
-        # Configuração do Canvas para redimensionar corretamente o conteúdo
         self.scrollable_frame.bind(
             "<Configure>", lambda e: self.canvas.configure(
                 scrollregion=self.canvas.bbox("all")
             )
         )
 
-        # Criando uma janela dentro do Canvas que conterá o frame rolável
         self.canvas_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-
-        # Associando a Scrollbar ao Canvas
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Garantindo que o Frame não se expanda horizontalmente ao adicionar elementos
-        self.scrollable_frame.update_idletasks()
-        self.canvas.config(width=self.scrollable_frame.winfo_reqwidth())
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
 
-        # Permitir rolagem com a roda do mouse
-        def _on_mouse_wheel(event):
-            self.canvas.yview_scroll(-1 * (event.delta // 120), "units")
+        self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(-1 * (e.delta // 120), "units"))
 
-        # Associar rolagem do mouse ao Canvas
-        self.canvas.bind_all("<MouseWheel>", _on_mouse_wheel)   
-
-        # Lista de pedidos
         self.pedidos = []
-
-        # Variáveis
         self.tamanho_var = tk.StringVar(value="Pequeno")
         self.pagamento_var = tk.StringVar(value="Dinheiro")
         self.pre_pronto_var = tk.StringVar(value="Nenhum")
 
-        # Dicionários de preços
         self.precos_tamanhos = {
             "Pequeno": (10.00, "300ml"),
             "Médio": (15.00, "500ml"),
             "Grande": (20.00, "700ml")
         }
+
         self.adicional_tamanho = {
             "Pequeno": 0,
             "Médio": 5.00,
             "Grande": 10.00
         }
+
         self.precos_pre_prontos = {
             "Energia Total": 18.00,
             "Choco Love": 22.00,
@@ -73,6 +128,7 @@ class AcaiApp:
             "Nutella Mix": 25.00,
             "Power Whey": 23.00
         }
+
         self.descricao_pre_prontos = {
             "Energia Total": "Açaí com banana, granola e mel.",
             "Choco Love": "Açaí com Nutella, Ovomaltine e chantilly.",
@@ -80,25 +136,38 @@ class AcaiApp:
             "Nutella Mix": "Açaí com Nutella, morango e chantilly.",
             "Power Whey": "Açaí com whey protein, banana e aveia."
         }
+
         self.precos_acompanhamentos = {
-            "Leite Condensado": 2.00,
-            "Granola": 1.50,
-            "Banana": 2.50,
+            "Leite Condensado": 5.00,
+            "Granola": 4.50,
+            "Banana": 3.50,
             "Paçoca": 3.00,
-            "Morango": 3.50,
-            "Nutella": 5.00,
+            "Morango": 4.00,
+            "Nutella": 8.00,
             "Mel": 2.50,
-            "Ovomaltine": 3.00,
-            "Chantilly": 2.00
+            "Ovomaltine": 5.00,
+            "Chantilly": 3.00
         }
 
         self.acompanhamentos = {item: tk.BooleanVar() for item in self.precos_acompanhamentos.keys()}
 
-        # Interface
         self.criar_interface()
 
     def criar_interface(self):
-        """Cria a interface do sistema de pedidos."""
+
+        try:
+            imagem = Image.open(r"C:\DESN2025V1\DESN20252V1\Programação de apps\python\tk\acai.png")  # Caminho absoluto
+            imagem = imagem.resize((210, 65))  # Ajuste conforme necessário
+            self.img_tk = ImageTk.PhotoImage(imagem)
+
+    # Criar um rótulo para exibir a imagem no topo
+            self.label_imagem = tk.Label(self.scrollable_frame, image=self.img_tk, bg='gray')
+            self.label_imagem.pack(pady=5, anchor="n", fill="x")  # Fixando a imagem no topo e preenchendo a largura
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao carregar a imagem: {e}")
+
+
+
         tk.Label(self.scrollable_frame, text="Escolha o tamanho do copo:", fg='white', bg='purple').pack(pady=5, fill="x")
         self.criar_radio_buttons_tamanhos()
 
@@ -111,20 +180,18 @@ class AcaiApp:
         tk.Label(self.scrollable_frame, text="Forma de pagamento:", fg='white', bg='green').pack(pady=2)
         self.criar_radio_buttons_pagamento()
 
-        self.valor_total_label = tk.Label(self.scrollable_frame, text="Total: R$0.00", fg="green",bg='grey', font=("Arial", 12, "bold"))
+        self.valor_total_label = tk.Label(self.scrollable_frame, text="Total: R$0.00", fg="green", bg='grey', font=("Arial", 12, "bold"))
         self.valor_total_label.pack()
 
         tk.Button(self.scrollable_frame, text="Adicionar Açai", command=self.montar_acai).pack()
         tk.Button(self.scrollable_frame, text="Finalizar Pedido", command=self.finalizar_pedido, fg="red").pack()
 
     def criar_radio_buttons_tamanhos(self):
-        """Cria os radio buttons para selecionar o tamanho do açaí."""
         for tamanho, (preco, ml) in self.precos_tamanhos.items():
             tk.Radiobutton(self.scrollable_frame, text=f"{tamanho} - R${preco:.2f} ({ml})", 
                            variable=self.tamanho_var, value=tamanho, command=self.atualizar_total, bg="gray").pack()
 
     def criar_radio_buttons_acais(self):
-        """Cria os radio buttons para selecionar um açaí pré-pronto."""        
         for nome, preco in self.precos_pre_prontos.items():
             frame = tk.Frame(self.scrollable_frame, bg="gray")
             frame.pack()
@@ -135,27 +202,23 @@ class AcaiApp:
         tk.Radiobutton(self.scrollable_frame, text="Nenhum", variable=self.pre_pronto_var, value="Nenhum", command=self.atualizar_total, bg="gray").pack()
 
     def criar_check_buttons_acompanhamentos(self):
-        """Cria os check buttons para selecionar os acompanhamentos."""
         for item, var in self.acompanhamentos.items():
             tk.Checkbutton(self.scrollable_frame, text=f"{item} - R${self.precos_acompanhamentos[item]:.2f}", variable=var, command=self.atualizar_total, bg="gray").pack()
 
     def criar_radio_buttons_pagamento(self):
-        """Cria os radio buttons para selecionar a forma de pagamento."""
-        for pagamento in ["Dinheiro", "Cartão", "Pix"]:
+        for pagamento in ["Dinheiro", "Cartão", "Pix(5% de desconto)"]:
             tk.Radiobutton(self.scrollable_frame, text=pagamento, variable=self.pagamento_var, value=pagamento, bg="gray").pack()
 
     def atualizar_total(self):
-        """Atualiza o valor total do pedido com base nas escolhas feitas."""
         total = 0
         tamanho = self.tamanho_var.get()
         pre_pronto = self.pre_pronto_var.get()
 
         if pre_pronto != "Nenhum":
-            # Se for um açaí pré-pronto, pega apenas o preço dele e adiciona o extra do tamanho
             total += self.precos_pre_prontos[pre_pronto] + self.adicional_tamanho[tamanho]
         else:
-            # Se for um açaí personalizado, pega o preço do tamanho e adiciona acompanhamentos
             total += self.precos_tamanhos[tamanho][0]
+        
         for item, var in self.acompanhamentos.items():
             if var.get():
                 total += self.precos_acompanhamentos[item]
@@ -163,7 +226,6 @@ class AcaiApp:
         self.valor_total_label.config(text=f"Total: R${total:.2f}")
     
     def montar_acai(self):
-        """Montar o açaí e adicioná-lo ao pedido."""
         pedido = {
             "Tamanho": self.tamanho_var.get(),
             "Açaí Pré-Pronto": self.pre_pronto_var.get(),
@@ -175,16 +237,14 @@ class AcaiApp:
         messagebox.showinfo("Pedido Adicionado", "Açaí adicionado ao pedido!")
 
     def mostrar_descricao(self, nome):
-        """Exibe a descrição do açaí pré-pronto selecionado."""
         descricao = self.descricao_pre_prontos.get(nome, "Descrição não disponível.")
         messagebox.showinfo(nome, descricao)
 
     def finalizar_pedido(self):
-        """Finaliza o pedido e gera o cupom fiscal com a imagem ao lado e a barra de rolagem."""
         if not self.pedidos:
             messagebox.showwarning("Aviso", "Nenhum pedido foi feito!")
             return
-        
+
         total_geral = sum(p["Preço"] for p in self.pedidos)
         cupom = "CUPOM FISCAL\n" + "-"*20 + "\n"
         for i, pedido in enumerate(self.pedidos, 1):
@@ -197,7 +257,7 @@ class AcaiApp:
         # Criar uma nova janela para o cupom e a imagem
         nova_janela = tk.Toplevel(self.root)
         nova_janela.title("Cupom Fiscal")
-        nova_janela.geometry("600x600")
+        nova_janela.geometry("600x300")
 
         # Criando o Canvas com a barra de rolagem
         canvas = tk.Canvas(nova_janela, bg="white")
@@ -216,14 +276,14 @@ class AcaiApp:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        # Adicionar o texto do cupom no canvas
-        label_cupom = tk.Label(scrollable_frame, text=cupom, justify=tk.LEFT, font=("Arial", 10), bg="white")
-        label_cupom.pack(side=tk.LEFT, padx=20)
+        # Adicionando o cupom na tela
+        cupom_label = tk.Label(scrollable_frame, text=cupom, font=("Courier", 12), bg="white", justify="left")
+        cupom_label.pack(pady=10)
 
-        # Carregar e exibir a imagem
+        # Adicionando a imagem (caso você tenha uma imagem do cupom ou um logotipo, você pode usá-la aqui)
         try:
             imagem = Image.open(r"C:\DESN2025V1\DESN20252V1\Programação de apps\python\tk\image.webp")
-            imagem = imagem.resize((400, 300))  # Redimensionar imagem
+            imagem = imagem.resize((200, 100))  # Redimensionar imagem
             img_tk = ImageTk.PhotoImage(imagem)
             label_imagem = tk.Label(scrollable_frame, image=img_tk, bg="white")
             label_imagem.image = img_tk  # Necessário para manter uma referência à imagem
@@ -231,8 +291,16 @@ class AcaiApp:
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao carregar a imagem: {e}")
 
-        nova_janela.mainloop()
+        # Fechando o pedido e retornando ao login
+        tk.Button(scrollable_frame, text="Fechar", command=self.voltar_login).pack(pady=10)
 
-root = tk.Tk()
-app = AcaiApp(root)
-root.mainloop()
+    def voltar_login(self):
+        self.root.destroy()
+        abrir_login()
+
+# Função de inicialização do sistema
+def main():
+    abrir_login()
+
+if __name__ == "__main__":
+    main()
